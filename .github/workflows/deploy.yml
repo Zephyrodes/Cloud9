@@ -34,7 +34,7 @@ jobs:
           username: ${{ secrets.CLOUD9_USER }}
           key: ${{ secrets.CLOUD9_SSH_KEY }}
           script: |
-            cd ~/environment/tu-repo
+            cd ~/environment/Cloud9
             git pull origin main
             pip install -r requirements.txt
             sudo systemctl restart fastapi
