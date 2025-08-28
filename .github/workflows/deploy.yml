@@ -1,0 +1,40 @@
+name: Deploy FastAPI to Cloud9
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: pytest -v
+
+  deploy:
+    needs: build-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Cloud9 via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.CLOUD9_HOST }}
+          username: ${{ secrets.CLOUD9_USER }}
+          key: ${{ secrets.CLOUD9_SSH_KEY }}
+          script: |
+            cd ~/environment/tu-repo
+            git pull origin main
+            pip install -r requirements.txt
+            sudo systemctl restart fastapi
